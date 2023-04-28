@@ -1,5 +1,5 @@
 #include <QApplication>
-#include "opengl_widget.h"
+#include "opengl_widget.hpp"
 
 int main(int argc, char* argv[])
 {
