@@ -64,7 +64,41 @@ void OpenGlWindow::initialize() {
 	}
 
 	if (!m_program->link())
-		qDebug() << "Shader linker errors :\n" << m_program->log();  
+		qDebug() << "Shader linker errors :\n" << m_program->log();
+
+  float vertices[] = {
+		-0.5f, -0.5f, 0.0f,
+		 0.5f, -0.5f, 0.0f,
+		 0.0f,  0.5f, 0.0f
+	};
+
+	// create a new buffer for the vertices
+	m_vertexBufferObject = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer); // VBO
+	m_vertexBufferObject.create(); // create underlying OpenGL object
+	m_vertexBufferObject.setUsagePattern(QOpenGLBuffer::StaticDraw); // must be called before allocate
+
+	m_vertexBufferObject.bind(); // set it active in the context, so that we can write to it
+	// int bufSize = sizeof(vertices) = 9 * sizeof(float) = 9*4 = 36 bytes
+	m_vertexBufferObject.allocate(vertices, sizeof(vertices) ); // copy data into buffer
+
+  // Initialize the Vertex Array Object (VAO) to record and remember subsequent attribute assocations with
+	// generated vertex buffer(s)
+	m_vao.create(); // create underlying OpenGL object
+  m_vao.bind(); // sets the Vertex Array Object current to the OpenGL context so it monitors attribute assignments
+  // now all following enableAttributeArray(), disableAttributeArray() and setAttributeBuffer() calls are
+	// "recorded" in the currently bound VBA.
+
+	// Enable attribute array at layout location 0
+	m_program->enableAttributeArray(0);
+	m_program->setAttributeBuffer(0, GL_FLOAT, 0, 3);
+  // This maps the data we have set in the VBO to the "position" attribute.
+	// 0 - offset - means the "position" data starts at the begin of the memory array
+	// 3 - size of each vertex (=vec3) - means that each position-tuple has the size of 3 floats (those are the 3 coordinates,
+	//     mind: this is the size of GL_FLOAT, not the size in bytes!
+
+  // Release (unbind) all
+	m_vertexBufferObject.release();
+	m_vao.release(); // not really necessary, but done for completeness
 }
 
 void OpenGlWindow::render() {
