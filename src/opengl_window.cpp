@@ -24,6 +24,7 @@ void printProgramInfoLog(GLuint obj);
 OpenGlWindow::OpenGlWindow(QWindow *parent)
   : QWindow(parent)
   , m_context(nullptr)
+  , needsInitialize(true)
 {
 	setSurfaceType(QWindow::OpenGLSurface);
 }
@@ -33,21 +34,6 @@ OpenGlWindow::~OpenGlWindow() {
 }
 
 void OpenGlWindow::initialize() {
-  if (!isExposed())
-    return;
-
-  // initialize on first call
-	if (m_context == nullptr) {
-    m_context = new QOpenGLContext(this);
-    m_context->setFormat(requestedFormat());
-    m_context->create();
-	}
-
-  m_context->makeCurrent(this);
-
-  initializeOpenGLFunctions();
-  initialize(); // call user code
-
   // shader part
   m_program = new QOpenGLShaderProgram();
   // shaderProgram = glCreateProgram();
@@ -102,10 +88,45 @@ void OpenGlWindow::initialize() {
 }
 
 void OpenGlWindow::render() {
+  // this function is called for every frame to be rendered on screen
+	const qreal retinaScale = devicePixelRatio(); // needed for Macs with retina display
+	glViewport(0, 0, width() * retinaScale, height() * retinaScale);
+
+	// set the background color = clear color
+	glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// use our shader program
+	m_program->bind();
+	// bind the vertex array object, which in turn binds the vertex buffer object and
+	// sets the attribute buffer in the OpenGL context
+	m_vao.bind();
+	// now draw the triangles:
+	// - GL_TRIANGLES - draw individual triangles
+	// - 0 index of first triangle to draw
+	// - 3 number of vertices to process
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	// finally release VAO again (not really necessary, just for completeness)
+	m_vao.release();
 }
 
 void OpenGlWindow::renderNow() {
-  //  m_context->makeCurrent(this);
+  if (!isExposed())
+    return;
+  // initialize on first call
+	if (m_context == nullptr) {
+    m_context = new QOpenGLContext(this);
+    m_context->setFormat(requestedFormat());
+    m_context->create();
+	}
+
+  m_context->makeCurrent(this);
+
+  if (needsInitialize) {
+    initializeOpenGLFunctions();
+    initialize(); // call user code
+    needsInitialize = false;
+  }
   render();
   m_context->swapBuffers(this);
 }

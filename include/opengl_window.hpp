@@ -34,6 +34,7 @@ private:
   QOpenGLVertexArrayObject m_vao;
   QOpenGLBuffer	m_vertexBufferObject;
   QOpenGLShaderProgram *m_program;
+  bool needsInitialize;
 };
 
 #endif // OPENGL_WINDOW_HPP_
