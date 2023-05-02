@@ -6,6 +6,12 @@ find_package(Qt5 COMPONENTS Core Widgets OpenGL REQUIRED)
 find_package( GLUT REQUIRED)
 find_package( GLEW   REQUIRED )
 find_package( OpenGL REQUIRED)
+#set(CMAKE_AUTORCC ON)
+
+list (APPEND RESOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources.qrc
+)
+qt5_add_resources (RCC_SOURCES ${RESOURCES})
 
 set(MAIN_OPENGL_WINDOW_TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
@@ -71,6 +77,7 @@ target_sources(opengl_window
  PRIVATE
   ${OPENGL_WINDOW_SOURCES}
   ${OPENGL_WINDOW_MOC_SOURCES}
+  ${RCC_SOURCES}
 )
 target_include_directories(opengl_window
  PRIVATE

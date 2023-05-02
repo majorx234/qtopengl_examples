@@ -38,13 +38,13 @@ void OpenGlWindow::initialize() {
   m_program = new QOpenGLShaderProgram();
   // shaderProgram = glCreateProgram();
   if (!m_program->addShaderFromSourceFile(
-	    QOpenGLShader::Vertex, ":/shaders/pass_through.vert"))
+	    QOpenGLShader::Vertex, ":/src/shader/pass_through.vert"))
 	{
 		qDebug() << "Vertex shader errors :\n" << m_program->log();
 	}
 
 	if (!m_program->addShaderFromSourceFile(
-	    QOpenGLShader::Fragment, ":/shaders/uniform_color.frag"))
+	    QOpenGLShader::Fragment, ":/src/shader/uniform_color.frag"))
 	{
 		qDebug() << "Fragment shader errors :\n" << m_program->log();
 	}
