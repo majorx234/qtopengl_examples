@@ -30,7 +30,15 @@ OpenGlWindow::OpenGlWindow(QWindow *parent)
 }
 
 OpenGlWindow::~OpenGlWindow() {
+	// resource cleanup
 
+	// since we release resources related to an OpenGL context,
+	// we make this context current before cleaning up our resources
+	m_context->makeCurrent(this);
+
+	m_vao.destroy();
+	m_vertexBufferObject.destroy();
+	delete m_program;
 }
 
 void OpenGlWindow::initialize() {
